@@ -74,30 +74,39 @@ const productData = JSON.parse(data);
 
 const server = http.createServer( (req, res) => {
         
-    const pathName = req.url;
+    //console.log(req.url);
+
+    /**
+     * ES6 destructuring - query, pathname property
+     *  names are available in the result of parse method.
+     **/ 
+    const { query, pathname } = url.parse(req.url, true);
+
 
     //Overview page
-    if(pathName === '/' || pathName === '/overview') {
+    if(pathname === '/' || pathname === '/overview') {
 
         const cardsHtml = productData.map( element => replaceTemplate(card, element) ).join('');
 
-        //console.log(cardsHtml);
-        
         const output = overview.replace('{%PRODUCT_CARDS%}', cardsHtml);
 
         res.writeHead(200, {'Content-type': 'text/html'});
-
         res.end(output); 
     
     // Product Page 
-    } else if(pathName === '/product') {
+    } else if(pathname === '/product') {
         
-        res.end(productOverview);
+        console.log('Product ID: ', query.id);
+        const output = replaceTemplate(product, productData[query.id]);
+
+        res.writeHead(200, {'Content-type': 'text/html'});
+        res.end(output);
 
     // API 
-    } else if(pathName === '/api') { // to read data.json
+    } else if(pathname === '/api') { // to read data.json
         
-        res.end(templateOverview);
+        res.writeHead(200, {'Content-type': 'text/html'});
+        res.end(data);
 
     // Not Found
     } else {
@@ -107,22 +116,21 @@ const server = http.createServer( (req, res) => {
 
 });
 
+//function to replace placeholders
 const replaceTemplate = (temp, prdEl) => {
-    let output = temp.replace(/{%PRODUCT_NAME%}/ig, prdEl.productName);
-    output = output.replace(/{%PRODUCT_IMAGe%}/ig, prdEl.image,);
-    output = output.replace(/{%PRODUCT_FROM%}/ig, prdEl.from);
-    output = output.replace(/{%PRODUCT_IMAGe%}/ig, prdEl.image);
-    output = output.replace(/{%PRODUCT_QTY%}/ig, prdEl.quantity);
-    output = output.replace(/{%PRODUCT_PRICE%}/ig, prdEl.price);
-    output = output.replace(/{%PRODUCT_NUTRIENTS%}/ig, prdEl.nutrients);
-    output = output.replace(/{%PRODUCT_ID%}/ig, prdEl.id);
-    output = output.replace(/{%PRODUCT_DESCRIPTION%}/ig, prdEl.description);
-
-    console.log(prdEl.organic);
+    let output = temp.replace(/{%PRODUCT_NAME%}/g, prdEl.productName);
+    output = output.replace(/{%PRODUCT_IMAGe%}/g, prdEl.image,);
+    output = output.replace(/{%PRODUCT_FROM%}/g, prdEl.from);
+    output = output.replace(/{%PRODUCT_IMAGe%}/g, prdEl.image);
+    output = output.replace(/{%PRODUCT_QTY%}/g, prdEl.quantity);
+    output = output.replace(/{%PRODUCT_PRICE%}/g, prdEl.price);
+    output = output.replace(/{%PRODUCT_NUTRIENTS%}/g, prdEl.nutrients);
+    output = output.replace(/{%PRODUCT_ID%}/g, prdEl.id);
+    output = output.replace(/{%PRODUCT_DESCRIPTION%}/g, prdEl.description);
 
     if(!prdEl.organic) {
         // not-organic is a css class which hides the div in template
-        output = output.replace(/{%NOT_ORGANIC%}/ig, 'not-organic');
+        output = output.replace(/{%NOT_ORGANIC%}/g, 'not-organic');
     }
     //console.log('Output --> : ', output);
     return output;
