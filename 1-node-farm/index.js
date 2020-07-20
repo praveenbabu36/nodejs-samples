@@ -2,6 +2,7 @@ const fs = require('fs'); // file system module
 const path = require('path');
 const http = require('http');
 const url = require('url');
+const replaceTemplateModule = require('./modules/replaceTemplate');
 
 /////////////////////////////////////////////////////////////////////////
 //Files Sample
@@ -86,7 +87,7 @@ const server = http.createServer( (req, res) => {
     //Overview page
     if(pathname === '/' || pathname === '/overview') {
 
-        const cardsHtml = productData.map( element => replaceTemplate(card, element) ).join('');
+        const cardsHtml = productData.map( element => replaceTemplateModule.replaceTemplate(card, element) ).join('');
 
         const output = overview.replace('{%PRODUCT_CARDS%}', cardsHtml);
 
@@ -97,7 +98,7 @@ const server = http.createServer( (req, res) => {
     } else if(pathname === '/product') {
         
         console.log('Product ID: ', query.id);
-        const output = replaceTemplate(product, productData[query.id]);
+        const output = replaceTemplateModule.replaceTemplate(product, productData[query.id]);
 
         res.writeHead(200, {'Content-type': 'text/html'});
         res.end(output);
@@ -116,25 +117,7 @@ const server = http.createServer( (req, res) => {
 
 });
 
-//function to replace placeholders
-const replaceTemplate = (temp, prdEl) => {
-    let output = temp.replace(/{%PRODUCT_NAME%}/g, prdEl.productName);
-    output = output.replace(/{%PRODUCT_IMAGe%}/g, prdEl.image,);
-    output = output.replace(/{%PRODUCT_FROM%}/g, prdEl.from);
-    output = output.replace(/{%PRODUCT_IMAGe%}/g, prdEl.image);
-    output = output.replace(/{%PRODUCT_QTY%}/g, prdEl.quantity);
-    output = output.replace(/{%PRODUCT_PRICE%}/g, prdEl.price);
-    output = output.replace(/{%PRODUCT_NUTRIENTS%}/g, prdEl.nutrients);
-    output = output.replace(/{%PRODUCT_ID%}/g, prdEl.id);
-    output = output.replace(/{%PRODUCT_DESCRIPTION%}/g, prdEl.description);
 
-    if(!prdEl.organic) {
-        // not-organic is a css class which hides the div in template
-        output = output.replace(/{%NOT_ORGANIC%}/g, 'not-organic');
-    }
-    //console.log('Output --> : ', output);
-    return output;
-}
 
 server.listen(8002, 'localhost', () => {
     console.log('Server has been started!!! Listening to port 8002');
