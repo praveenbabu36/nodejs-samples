@@ -2,6 +2,9 @@ const fs = require('fs'); // file system module
 const path = require('path');
 const http = require('http');
 const url = require('url');
+
+const slugify = require('slugify'); 
+
 const replaceTemplateModule = require('./modules/replaceTemplate');
 
 /////////////////////////////////////////////////////////////////////////
@@ -87,7 +90,7 @@ const server = http.createServer( (req, res) => {
     //Overview page
     if(pathname === '/' || pathname === '/overview') {
 
-        const cardsHtml = productData.map( element => replaceTemplateModule.replaceTemplate(card, element) ).join('');
+        const cardsHtml = productData.map( element => replaceTemplateModule.replaceTemplate(card, element)).join('');
 
         const output = overview.replace('{%PRODUCT_CARDS%}', cardsHtml);
 
