@@ -13,7 +13,7 @@ server.on("request", (req, res) => {
   });*/
 
   // Solution 2 - Using streams
-  const readStream = fs.createReadStream("test-file.txt");
+  /*const readStream = fs.createReadStream("test-file.txt");
 
   readStream.on("data", (chunk) => {
     res.write(chunk);
@@ -22,6 +22,22 @@ server.on("request", (req, res) => {
   readStream.on("end", () => {
     res.end();
   });
+
+  readStream.on("error", (err) => {
+    console.log(err);
+    res.statusCode = 500;
+    res.end("File not found!");
+  });*/
+
+  // solution 2 has the problem of backpressure as read using stream is faster than response write.
+  //     this may cause data backlog over the network.
+  //
+
+  /**
+   * Solution 3 - Using pipe() of read stream
+   */
+  const readStream = fs.createReadStream("test-file.txt");
+  readStream.pipe(res); // pipe into a writable stream.
 
   readStream.on("error", (err) => {
     console.log(err);
