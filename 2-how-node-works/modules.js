@@ -17,3 +17,13 @@ console.log("-------------------------------------");
 const { add, substract } = require("./calc-module2");
 console.log(add(2, 3));
 console.log(substract(4, 3));
+
+// caching
+console.log("1st call");
+require("./caching-module1")();
+
+console.log("2nd call");
+require("./caching-module1")();
+
+console.log("3rd call");
+require("./caching-module1")();
